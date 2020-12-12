@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Text, View,FlatList,Dimensions,TouchableOpacity ,SafeAreaView} from 'react-native';
+import {Text, View,FlatList,Dimensions,TouchableOpacity ,SafeAreaView, Vibration} from 'react-native';
 import {Paragraph,IconButton,Card} from 'react-native-paper';
 import {evaluate} from 'mathjs';
 import {connect} from 'react-redux';
@@ -8,7 +8,7 @@ class CalculatorComponent extends React.Component {
 
   
   performOperation(){
-    let screen=this.props.screen;
+    let screen=String(this.props.screen);
     let output='';
     try{
       output=evaluate(screen);
@@ -18,13 +18,11 @@ class CalculatorComponent extends React.Component {
       output='Error!'
     }
     console.log(output)
-    this.setState({
-      screen:output
-    });
+    this.props.dispatch({type:"SET-SCREEN",payload:output});    //Dispatch output to create a new state
   }
 
   updateScreen(value){
-    let screen=this.props.screen;
+    let screen=String(this.props.screen);
     if(screen=='null'){
       screen=value;
     }
@@ -32,46 +30,22 @@ class CalculatorComponent extends React.Component {
       screen=screen+value;
     }
     
-    this.setState({
-      screen:screen
-    });
+    this.props.dispatch({type:"SET-SCREEN",payload:screen});
   }
 
   doBackspace(){
-    let screen=this.props.screen;
+    let screen=String(this.props.screen);
     if(screen!='null'){
       screen=screen.slice(0,screen.length-1);
     }
     if(screen==''){
       screen='null'
     }
-    this.setState({
-      screen:screen
-    });
+    this.props.dispatch({type:"SET-SCREEN",payload:screen});
   }
 
   setInitialState(){
-    let numbers=[
-      {id:1,title:'1'},
-      {id:2,title:'2'},
-      {id:3,title:'3'},
-      {id:4,title:'4'},
-      {id:5,title:'5'},
-      {id:6,title:'6'},
-      {id:7,title:'7'},
-      {id:8,title:'8'},
-      {id:9,title:'9'},
-      {id:10,title:'0'},
-      {id:11,title:'+'},
-      {id:12,title:'-'},
-      {id:13,title:'*'},
-      {id:14,title:'/'},
-      {id:15,title:'='},
-    ];
-    this.setState({
-      screen:'null',
-      numbers:numbers
-    });
+    this.props.dispatch({type:"INITIAL-STATE"});
   }
 
   componentDidMount(){
@@ -115,7 +89,6 @@ class CalculatorComponent extends React.Component {
             {numbers.length>0?
             <FlatList
                 data={numbers}
-                nestedScrollEnabled={true}
                 numColumns={3}
                         renderItem={({ item }) => (
                           
@@ -129,21 +102,29 @@ class CalculatorComponent extends React.Component {
                             }}
                           >
                                 <TouchableOpacity onPress={()=>{
-                                  if(item.title=='=')
-                                    this.performOperation();
-                                  else{
-                                    this.updateScreen(item.title);
-                                  }
-                                  }}
-                                  style={{
-                                       marginVertical:10
-                                  }}
+                                    Vibration.vibrate(50);
+                                    if(item.title=='=')
+                                      this.performOperation();
+                                    else{
+                                      this.updateScreen(item.title);
+                                    }
+                                    }}
+                                    style={{
+                                        alignSelf: 'center',
+                                        textAlign: 'center',
+                                        marginVertical:10
+                                    }}
+                                    delayPressIn={0}
                                   >
                                   <Paragraph style={{
-                                          fontSize:20,
-                                          color:item.id>10?'orange':'black',
-                                          fontWeight:item.id>10?'700':'500'
-                                    }}>{item.title}</Paragraph>
+                                                fontSize:25,
+                                                color:item.id>10?'orange':'black',
+                                                fontWeight:item.id>10?'700':'500',
+                                                paddingVertical:5
+                                              }}
+                                      textBreakStrategy='simple'
+                                    >{item.title}
+                                  </Paragraph>
                                 </TouchableOpacity>
                                 
                           </View>

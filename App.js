@@ -27,10 +27,21 @@ const initialState = {
 }
 
 const reducer = (state=initialState,action) =>{    //Old State + Action = New State
-  return state;
+  switch(action.type){
+    case "INITIAL-STATE":
+      return initialState
+    case "SET-SCREEN":
+      return{
+        ...state,
+        screen:action.payload
+      }
+    default:
+      return state;
+  }
 }
 
 const store = createStore(reducer);    //Create State Store
+
 
 export default function App() {
   return (
