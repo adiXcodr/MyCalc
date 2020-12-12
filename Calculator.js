@@ -2,16 +2,13 @@ import * as React from 'react';
 import {Text, View,FlatList,Dimensions,TouchableOpacity ,SafeAreaView} from 'react-native';
 import {Paragraph,IconButton,Card} from 'react-native-paper';
 import {evaluate} from 'mathjs';
+import {connect} from 'react-redux';
 
-export default class CalculatorComponent extends React.Component {
+class CalculatorComponent extends React.Component {
 
-  state={
-      screen:'',
-      numbers:[]
-  }
-
+  
   performOperation(){
-    let screen=this.state.screen;
+    let screen=this.props.screen;
     let output='';
     try{
       output=evaluate(screen);
@@ -27,7 +24,7 @@ export default class CalculatorComponent extends React.Component {
   }
 
   updateScreen(value){
-    let screen=this.state.screen;
+    let screen=this.props.screen;
     if(screen=='null'){
       screen=value;
     }
@@ -41,7 +38,7 @@ export default class CalculatorComponent extends React.Component {
   }
 
   doBackspace(){
-    let screen=this.state.screen;
+    let screen=this.props.screen;
     if(screen!='null'){
       screen=screen.slice(0,screen.length-1);
     }
@@ -70,7 +67,7 @@ export default class CalculatorComponent extends React.Component {
       {id:13,title:'*'},
       {id:14,title:'/'},
       {id:15,title:'='},
-    ]
+    ];
     this.setState({
       screen:'null',
       numbers:numbers
@@ -82,25 +79,43 @@ export default class CalculatorComponent extends React.Component {
   }
   
   render(){
-    const numbers=this.state.numbers;
+    const numbers=this.props.numbers;
     return (
       <SafeAreaView style={{width:'90%',alignSelf:'center'}}>
         
-          <View style={{marginHorizontal:'1%',marginVertical:20}}>
-            <Paragraph style={{fontSize:20,fontWeight:'700',color:'orange',marginTop:40,width:'100%'}}>MyCalc</Paragraph>
+          <View style={{
+              marginHorizontal:'1%',
+              marginVertical:10
+            }}>
+            <Paragraph style={{
+              fontSize:20,
+              fontWeight:'700',
+              color:'orange',
+              marginTop:40,
+              width:'100%'
+              }}>MyCalc</Paragraph>
           </View>
 
       
-          <Card elevation={3} style={{marginVertical:40,paddingHorizontal:'10%',paddingVertical:30,backgroundColor:'white'}}>
-            <Paragraph style={{fontSize:20,fontWeight:'500'}}>{this.state.screen}</Paragraph>
+          <Card elevation={3} style={{
+                marginVertical:20,
+                paddingHorizontal:'10%',
+                paddingVertical:30,
+                backgroundColor:'white'
+            }}>
+            <Paragraph style={{
+                fontSize:20,
+                fontWeight:'500'
+              }}>{this.props.screen}</Paragraph>
           </Card>
 
-          <Card elevation={3} style={{paddingVertical:30}}>
+          <Card elevation={3} style={{
+                paddingVertical:30
+            }}>
             {numbers.length>0?
             <FlatList
                 data={numbers}
                 nestedScrollEnabled={true}
-                style={{}}
                 numColumns={3}
                         renderItem={({ item }) => (
                           
@@ -115,17 +130,19 @@ export default class CalculatorComponent extends React.Component {
                           >
                                 <TouchableOpacity onPress={()=>{
                                   if(item.title=='=')
-                                  this.performOperation();
+                                    this.performOperation();
                                   else{
                                     this.updateScreen(item.title);
                                   }
                                   }}
-                                  style={{marginVertical:10}}
+                                  style={{
+                                       marginVertical:10
+                                  }}
                                   >
                                   <Paragraph style={{
-                                    fontSize:20,
-                                    color:item.id>10?'orange':'black',
-                                    fontWeight:item.id>10?'700':'500'
+                                          fontSize:20,
+                                          color:item.id>10?'orange':'black',
+                                          fontWeight:item.id>10?'700':'500'
                                     }}>{item.title}</Paragraph>
                                 </TouchableOpacity>
                                 
@@ -136,19 +153,27 @@ export default class CalculatorComponent extends React.Component {
             :
             null
             }
-            <View style={{flexDirection:'row',alignSelf:'center',marginTop:10}}>
+            <View style={{
+                    flexDirection:'row',
+                    alignSelf:'center',
+                    marginTop:10
+              }}>
                                     <IconButton
                                         icon="restart"
                                         color={'orange'}
                                         size={25}
-                                        style={{marginHorizontal:'10%'}}
+                                        style={{
+                                          marginHorizontal:'10%'
+                                        }}
                                         onPress={() => this.setInitialState()}
                                     />
                                     <IconButton
                                         icon="backspace"
                                         color={'orange'}
                                         size={25}
-                                        style={{marginHorizontal:'10%'}}
+                                        style={{
+                                          marginHorizontal:'10%'
+                                        }}
                                         onPress={() => this.doBackspace()}
                                     />
             </View>
@@ -160,3 +185,10 @@ export default class CalculatorComponent extends React.Component {
   }
   
 }
+
+const mapStateToProps = state => ({
+  screen:state.screen,
+  numbers:state.numbers
+});
+
+export default connect(mapStateToProps) (CalculatorComponent) ;    //Connecting the component to Redux Store
