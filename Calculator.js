@@ -3,6 +3,7 @@ import {Text, View,FlatList,Dimensions,TouchableOpacity ,SafeAreaView, Vibration
 import {Paragraph,IconButton,Card} from 'react-native-paper';
 import {evaluate} from 'mathjs';
 import {connect} from 'react-redux';
+import {setScreen,setInitialState} from './redux/actions';
 
 class CalculatorComponent extends React.Component {
 
@@ -18,7 +19,7 @@ class CalculatorComponent extends React.Component {
       output='Error!'
     }
     console.log(output)
-    this.props.dispatch({type:"SET-SCREEN",payload:output});    //Dispatch output to create a new state
+    this.props.dispatch(setScreen(output));    //Dispatch output to create a new state
   }
 
   updateScreen(value){
@@ -30,7 +31,7 @@ class CalculatorComponent extends React.Component {
       screen=screen+value;
     }
     
-    this.props.dispatch({type:"SET-SCREEN",payload:screen});
+    this.props.dispatch(setScreen(screen));
   }
 
   doBackspace(){
@@ -41,15 +42,11 @@ class CalculatorComponent extends React.Component {
     if(screen==''){
       screen='null'
     }
-    this.props.dispatch({type:"SET-SCREEN",payload:screen});
-  }
-
-  setInitialState(){
-    this.props.dispatch({type:"INITIAL-STATE"});
+    this.props.dispatch(setScreen(screen));
   }
 
   componentDidMount(){
-    this.setInitialState();
+    this.props.dispatch(setInitialState());
   }
   
   render(){
@@ -146,7 +143,7 @@ class CalculatorComponent extends React.Component {
                                         style={{
                                           marginHorizontal:'10%'
                                         }}
-                                        onPress={() => this.setInitialState()}
+                                        onPress={() => this.props.dispatch(setInitialState())}
                                     />
                                     <IconButton
                                         icon="backspace"
